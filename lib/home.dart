@@ -6,6 +6,10 @@ import 'package:intl/date_symbol_data_local.dart';
 
 import 'helper/AnotacaoHelper.dart';
 
+
+
+
+
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 
@@ -15,18 +19,32 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
 
+
+
+
   TextEditingController _tarefa = TextEditingController();
   TextEditingController _descricaoTarefa = TextEditingController();
   var _db = AnotacaoHelper();
   List<Anotacao> _anotacoes = <Anotacao>[];
 
-  _exibirTelaCadastro(){
+  _exibirTelaCadastro( {Anotacao? anotacao} ){
+
+    String textoSalvarAtualizar = '';
+    if(anotacao == null){//salvando
+      _tarefa.text='';
+      _descricaoTarefa.text='';
+      textoSalvarAtualizar='Salvar';
+    }else{//atualizar
+      _tarefa.text= anotacao.titulo!;
+      _descricaoTarefa.text= anotacao.descricao!;
+      textoSalvarAtualizar='Atualizar';
+    }
 
     showDialog(
         context: context,
         builder: (context){
           return AlertDialog(
-            title: Text('Adicionar anotação'),
+            title: Text('$textoSalvarAtualizar anotação'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
@@ -49,7 +67,7 @@ class _HomeState extends State<Home> {
 
               FloatingActionButton(onPressed: (){
                 //salvar nota
-                _salvarAnotacao();
+                _salvarAtualizarAnotacao(anotacaoSelecionada: anotacao);
                 Navigator.pop(context);
               }, child: Icon(Icons.check), backgroundColor: Colors.green,),
             ],
@@ -77,13 +95,25 @@ class _HomeState extends State<Home> {
 
   }
 
-  _salvarAnotacao() async {
+  _salvarAtualizarAnotacao({Anotacao? anotacaoSelecionada}) async {
     String titulo = _tarefa.text;
     String descricao = _descricaoTarefa.text;
 
-    Anotacao anotacao = Anotacao(titulo, descricao, DateTime.now().toString());
-    int resultado = await _db.salvarAnotacao( anotacao );
-    print('salvar anotacao: '+resultado.toString());
+    if(anotacaoSelecionada == null){//salvar
+
+      Anotacao anotacao = Anotacao(titulo, descricao, DateTime.now().toString());
+      int resultado = await _db.salvarAnotacao( anotacao );
+      print('salvar anotacao: '+resultado.toString());
+
+    }else{//atualizando
+
+      anotacaoSelecionada.titulo = titulo;
+      anotacaoSelecionada.descricao = descricao;
+      anotacaoSelecionada.data = DateTime.now().toString();
+      int resultado = await _db.atualizarAnotacao(anotacaoSelecionada);
+
+    }
+
 
     _tarefa.text = '';
     _descricaoTarefa.text = '';
@@ -109,6 +139,17 @@ class _HomeState extends State<Home> {
     _recuperarAnotacoes();
   }
 
+
+
+
+
+
+
+
+
+
+
+
   @override
   Widget build(BuildContext context) {
     _recuperarAnotacoes();
@@ -131,6 +172,26 @@ class _HomeState extends State<Home> {
                   child: ListTile(
                     title: Text(anotacao.titulo.toString()),
                     subtitle: Text('${_formatarData(anotacao.data.toString())} - ${anotacao.descricao}'),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        GestureDetector(
+                          onTap: (){
+                            _exibirTelaCadastro(anotacao: anotacao);
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.only(right: 16),
+                            child: Icon(Icons.edit, color: Colors.green,),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: (){
+
+                          },
+                          child: Icon(Icons.remove_circle, color: Colors.red,),
+                        )
+                      ],
+                    ),
                   ),
                 );
               }))
