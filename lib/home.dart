@@ -1,6 +1,8 @@
 import 'package:app_anotacao/model/Anotacao.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'helper/AnotacaoHelper.dart';
 
@@ -89,6 +91,18 @@ class _HomeState extends State<Home> {
     _recuperarAnotacoes();
   }
 
+  _formatarData(String data){
+
+    initializeDateFormatting('pt_BR');
+
+    var formatador = DateFormat('d/M/y');
+    DateTime dataConvertida = DateTime.parse(data);
+    String dataFormatada = formatador.format( dataConvertida );
+
+    return dataFormatada;
+
+  }
+
   @override
   void initState() {
     super.initState();
@@ -116,7 +130,7 @@ class _HomeState extends State<Home> {
                 return Card(
                   child: ListTile(
                     title: Text(anotacao.titulo.toString()),
-                    subtitle: Text('${anotacao.data} - ${anotacao.descricao}'),
+                    subtitle: Text('${_formatarData(anotacao.data.toString())} - ${anotacao.descricao}'),
                   ),
                 );
               }))
