@@ -141,6 +141,54 @@ class _HomeState extends State<Home> {
 
   }
 
+  _confirmarRemocao(int id){
+
+    showDialog(
+        context: context,
+        builder: (context){
+          return AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Text('Confirmar Remoção?'),
+                      Container(
+                        padding: EdgeInsets.all(10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            ElevatedButton(
+                                onPressed: (){
+                                  _removerAnotacao(id);
+                                  Navigator.pop(context);},
+                                child: Text('Confirmar'),
+                            ),
+                            ElevatedButton(
+                                onPressed: (){Navigator.pop(context);},
+                                child: Text('Cancelar')
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+          );
+        }
+    );
+
+  }
+
   @override
   void initState() {
     super.initState();
@@ -173,7 +221,6 @@ class _HomeState extends State<Home> {
           Expanded(child: ListView.builder(
               itemCount: _anotacoes.length,
               itemBuilder: (context, index){
-
                 final anotacao = _anotacoes[index];
 
                 return Card(
@@ -194,7 +241,7 @@ class _HomeState extends State<Home> {
                         ),
                         GestureDetector(
                           onTap: (){
-                            _removerAnotacao(anotacao.id!);
+                            _confirmarRemocao(anotacao.id!);
                           },
                           child: Icon(Icons.remove_circle, color: Colors.red,),
                         )
@@ -202,6 +249,7 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                 );
+
               }))
         ],
       ),
